@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<meta name="referrer" content="no-referrer">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSS Craft Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>BSS Resource Calculator</h1>
+            <nav>
+                <button class="nav-btn active" onclick="openTab('inventory')">Your Resources</button>
+                <button class="nav-btn" onclick="openTab('crafting')">Crafting</button>
+            </nav>
+        </header>
+
+        <!-- Вкладка Инвентаря -->
+        <main id="inventory" class="tab-content active">
+            <div class="search-bar">
+                <input type="text" id="invSearch" placeholder="Search resources..." oninput="filterInventory()">
+            </div>
+            <div id="inventory-grid" class="inventory-grid">
+                <!-- Сюда JS вставит все ресурсы -->
+            </div>
+        </main>
+
+        <!-- Вкладка Крафта -->
+        <main id="crafting" class="tab-content">
+            <div class="craft-controls">
+                <select id="category-select" onchange="updateItemList()">
+                    <option value="Tools">Tools</option>
+                    <option value="Bags">Bags</option>
+                    <option value="Masks">Masks</option>
+                    <option value="Belts">Belts</option>
+                    <option value="Boots">Boots</option>
+                    <option value="Planters">Planters</option>
+                </select>
+                <select id="item-select" onchange="startCalculation()">
+                    <option value="">-- Select Item --</option>
+                </select>
+            </div>
+            <div id="result-area" class="result-area">
+                <p class="placeholder-text">Select an item to see the recipe breakdown</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Твой файл с данными -->
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
