@@ -223,45 +223,53 @@ select:focus { border-color: var(--accent-color); outline: none; }
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 9999; /* Чтобы была поверх всего */
+    z-index: 1000; /* Чтобы была поверх всех элементов */
     
-    background-color: #29abe0; /* Цвет Ko-Fi (или можно #f1c40f под твой стиль) */
-    color: white;
+    background-color: #ff5e5b; /* Яркий цвет Ko-fi (красный/оранжевый) */
+    color: white !important;
     text-decoration: none;
     font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    gap: 10px;
+    padding: 8px 16px;
+    border-radius: 50px; /* Скругленные края (как пилюля) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s ease, background-color 0.2s ease;
 }
 
-/* Ограничиваем размер картинки, чтобы она не была огромной */
+/* Ограничиваем размер картинки, чтобы она не раздувалась */
 .kofi-link img {
-    width: 20px !important;
-    height: 20px !important;
+    width: 24px !important; /* Жестко задаем размер чашки */
+    height: 24px !important;
     display: block;
+    margin: 0;
 }
 
-.kofi-link:hover {
-    transform: scale(1.05);
-    background-color: #2496c5;
+/* Стили для текста внутри */
+.kofi-link span {
     color: white;
+    letter-spacing: 0.3px;
 }
 
-/* На маленьких экранах можно оставить только иконку, чтобы не мешала */
+/* Эффект при наведении */
+.kofi-link:hover {
+    transform: translateY(-3px) scale(1.03); /* Немного приподнимается */
+    background-color: #e54e4b;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Для мобильных устройств (делаем еще компактнее) */
 @media (max-width: 480px) {
-    .kofi-link span {
-        display: none;
-    }
     .kofi-link {
-        padding: 10px;
+        padding: 8px;
         bottom: 15px;
         right: 15px;
+    }
+    .kofi-link span {
+        display: none; /* Скрываем текст на очень маленьких экранах, оставляем только иконку */
     }
 }
