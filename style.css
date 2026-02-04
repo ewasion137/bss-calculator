@@ -1,238 +1,174 @@
-/* Подключаем современный шрифт */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
 * {
     box-sizing: border-box;
-    transition: all 0.2s ease; /* Плавные переходы для всех элементов */
 }
 
 :root {
-    --bg-color: #0f111a;
-    --card-bg: #1a1d29;
-    --card-hover: #24283b;
-    --border-color: #2f354a;
-    --accent-color: #ffcc00; /* Более сочный желтый */
-    --accent-glow: rgba(255, 204, 0, 0.3);
-    --text-color: #e6edf3;
-    --text-muted: #8b949e;
-    --success-color: #4ade80;
-    --danger-color: #f87171;
-    --radius: 12px;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --border-color: #333;
+    --accent-color: #f1c40f;
+    --text-color: #e0e0e0;
+    --success-color: #2ecc71;
 }
 
 body {
     background-color: var(--bg-color);
-    background-image: 
-        radial-gradient(circle at 50% 0%, #1a1d29 0%, #0f111a 100%);
     color: var(--text-color);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     margin: 0;
-    padding: 40px 20px;
-    line-height: 1.5;
+    padding: 20px;
 }
 
-.app-container { 
-    max-width: 1000px; 
-    margin: 0 auto; 
-}
+.app-container { max-width: 900px; margin: 0 auto; }
 
-header h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    letter-spacing: -1px;
-    margin-bottom: 10px;
-    background: linear-gradient(to bottom, #fff, #8b949e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+header { text-align: center; margin-bottom: 30px; }
 
-/* Навигация */
-nav { 
-    display: flex; 
-    justify-content: center; 
-    gap: 12px; 
-    margin-bottom: 40px;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 8px;
-    border-radius: 16px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid var(--border-color);
-}
+nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
 
 .nav-btn {
-    padding: 12px 24px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.95rem;
-}
-
-.nav-btn:hover {
+    padding: 10px 20px;
+    background: #252525;
+    border: 1px solid var(--border-color);
     color: white;
-    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    border-radius: 5px;
 }
 
-.nav-btn.active { 
-    background: var(--accent-color); 
-    color: #000; 
-    box-shadow: 0 4px 15px var(--accent-glow);
-}
+.nav-btn.active { background: var(--accent-color); color: black; font-weight: bold; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
 /* Инвентарь */
 .inventory-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
-}
-
-.inv-card {
-    background: var(--card-bg);
-    padding: 12px 16px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-}
-
-.inv-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent-color);
-    background: var(--card-hover);
-}
-
-.inv-card img { 
-    width: 36px; 
-    height: 36px; 
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
-}
-
-.inv-card input {
-    width: 100%;
-    background: #0f111a;
-    border: 1px solid var(--border-color);
-    color: white;
-    padding: 8px 10px;
-    border-radius: 6px;
-    font-family: inherit;
-}
-
-.inv-card input:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--accent-glow);
-}
-
-/* Списки крафта */
-.craft-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--card-bg);
-    padding: 12px 20px;
-    border-radius: var(--radius);
-    margin-bottom: 10px;
-    border-left: 4px solid var(--accent-color);
-}
-
-/* Дерево результатов */
-.result-node {
-    margin-top: 12px;
-    padding: 12px 16px;
-    border-left: 2px solid var(--border-color);
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 0 var(--radius) var(--radius) 0;
-}
-
-.result-node:hover {
-    border-left-color: var(--accent-color);
-    background: rgba(255, 255, 255, 0.04);
-}
-
-/* Итоговая секция */
-.total-section {
-    margin-top: 50px;
-    padding: 30px;
-    background: linear-gradient(145deg, rgba(241, 196, 15, 0.1), rgba(0,0,0,0));
-    border-radius: 20px;
-    border: 1px solid rgba(241, 196, 15, 0.2);
-    backdrop-filter: blur(10px);
-}
-
-.total-section h2 {
-    margin-top: 0;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--accent-color);
-}
-
-.total-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
 }
 
+.inv-card {
+    background: var(--card-bg);
+    height: 60px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.inv-card img { width: 32px; height: 32px; object-fit: contain; }
+
+.inv-card input {
+    width: 100%;
+    background: #2d2d2d;
+    border: 1px solid #444;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    text-overflow: ellipsis;
+}
+
+/* Результаты крафта */
+.craft-controls { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+select { padding: 10px; background: #252525; color: white; border: 1px solid var(--border-color); border-radius: 5px; }
+
+.result-node {
+    margin-top: 10px;
+    padding: 10px;
+    border-left: 2px solid #444;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 0 8px 8px 0;
+}
+
+.total-section {
+    margin-top: 40px;
+    padding: 20px;
+    background: rgba(241, 196, 15, 0.1);
+    border-radius: 10px;
+    border: 1px solid var(--accent-color);
+}
+
+.total-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
 .total-item {
-    background: rgba(0,0,0,0.2);
-    padding: 10px 15px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
 }
 
-/* Кнопки */
+.total-item img {
+    width: 20px;
+    height: 20px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #444;
+    margin-bottom: 20px;
+}
+
+.node-header { display: flex; align-items: center; gap: 10px; }
+.node-header img { width: 24px; height: 24px; }
+
+.subs { margin-left: 25px; margin-top: 5px; }
+
+.done { color: var(--success-color); font-weight: bold; }
+.check { color: var(--success-color); margin-left: 5px; }
+
 #add-btn {
-    padding: 12px 25px;
-    background: var(--accent-color);
-    color: #000;
+    padding: 10px 15px;
+    background-color: var(--accent-color);
+    color: black;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     cursor: pointer;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.85rem;
+    font-weight: bold;
 }
 
-#add-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px var(--accent-glow);
+#crafting-list-area {
+    margin: 20px 0;
+}
+
+.craft-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2a2a2a;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-bottom: 5px;
 }
 
 .remove-btn {
-    background: rgba(248, 113, 113, 0.1);
-    color: var(--danger-color);
-    border: 1px solid var(--danger-color);
-    border-radius: 6px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.remove-btn:hover {
-    background: var(--danger-color);
+    background: #c0392b;
     color: white;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 22px;
+    text-align: center;
 }
 
-/* Кастомный скроллбар */
-::-webkit-scrollbar {
-    width: 8px;
+.undo-area {
+    margin-top: 15px;
+    text-align: center;
 }
-::-webkit-scrollbar-track {
-    background: var(--bg-color);
-}
-::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
+
+.undo-btn {
+    background: #3498db;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
