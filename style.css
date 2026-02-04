@@ -217,3 +217,56 @@ select:focus { border-color: var(--accent-color); outline: none; }
 }
 
 #add-btn:hover { opacity: 0.9; }
+
+.kofi-float-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #ff5e5b; /* Брендовый цвет Ko-Fi */
+    color: white;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.kofi-float-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    background-color: #ff7471;
+    color: white;
+}
+
+.kofi-float-btn img {
+    width: 24px;
+    height: auto;
+    animation: kofi-wiggle 3s infinite;
+}
+
+/* Небольшая анимация кружки, чтобы привлечь внимание */
+@keyframes kofi-wiggle {
+    0%, 90% { transform: rotate(0); }
+    92% { transform: rotate(15deg); }
+    94% { transform: rotate(-15deg); }
+    96% { transform: rotate(10deg); }
+    98% { transform: rotate(-10deg); }
+    100% { transform: rotate(0); }
+}
+
+/* Адаптация для мобилок, чтобы не перекрывала контент */
+@media (max-width: 600px) {
+    .kofi-float-btn span {
+        display: none; /* Скрываем текст на очень узких экранах, оставляем только иконку */
+    }
+    .kofi-float-btn {
+        padding: 10px;
+        bottom: 15px;
+        right: 15px;
+    }
+}
