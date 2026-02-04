@@ -1,174 +1,219 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 * {
     box-sizing: border-box;
+    transition: all 0.2s ease;
 }
 
 :root {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --border-color: #333;
+    --bg-color: #0d1117;
+    --card-bg: #161b22;
+    --border-color: #30363d;
     --accent-color: #f1c40f;
-    --text-color: #e0e0e0;
-    --success-color: #2ecc71;
+    --text-color: #c9d1d9;
+    --text-muted: #8b949e;
+    --success-color: #238636;
+    --radius: 8px;
 }
 
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, sans-serif;
     margin: 0;
     padding: 20px;
+    line-height: 1.4;
 }
 
-.app-container { max-width: 900px; margin: 0 auto; }
+.app-container { max-width: 850px; margin: 0 auto; }
 
-header { text-align: center; margin-bottom: 30px; }
-
-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+/* Навигация */
+nav { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
 
 .nav-btn {
-    padding: 10px 20px;
-    background: #252525;
+    padding: 8px 16px;
+    background: #21262d;
     border: 1px solid var(--border-color);
-    color: white;
+    color: var(--text-color);
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
 }
 
-.nav-btn.active { background: var(--accent-color); color: black; font-weight: bold; }
+.nav-btn:hover { background: #30363d; }
+.nav-btn.active { 
+    background: var(--accent-color); 
+    color: #000; 
+    border-color: var(--accent-color);
+}
 
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+/* Контейнеры вкладок */
+.tab-content { 
+    display: none; 
+    animation: fadeIn 0.3s ease;
+}
 
-/* Инвентарь */
+.tab-content.active { 
+    display: block; 
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Инвентарь (Resources) */
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-}
-
-.inv-card {
-    background: var(--card-bg);
-    height: 60px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 10px;
 }
 
-.inv-card img { width: 32px; height: 32px; object-fit: contain; }
+.inv-card {
+    background: #0d1117;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column; /* Текст над инпутом для компактности */
+    gap: 6px;
+}
+
+.inv-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Маленькие иконки */
+.inv-card img, .node-header img, .total-item img { 
+    width: 22px; 
+    height: 22px; 
+    object-fit: contain; 
+}
 
 .inv-card input {
     width: 100%;
-    background: #2d2d2d;
-    border: 1px solid #444;
+    background: #161b22;
+    border: 1px solid var(--border-color);
     color: white;
-    padding: 5px;
+    padding: 4px 8px;
     border-radius: 4px;
-    text-overflow: ellipsis;
+    font-size: 13px;
 }
+
+.inv-card input:focus { border-color: var(--accent-color); outline: none; }
+
+/* Крафт (Интерфейс выбора) */
+.craft-controls { 
+    display: flex; 
+    gap: 10px; 
+    margin-bottom: 20px; 
+    background: #0d1117;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+/* Стилизация Select */
+select { 
+    flex: 1;
+    padding: 8px 12px; 
+    background: #161b22; 
+    color: white; 
+    border: 1px solid var(--border-color); 
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+select:focus { border-color: var(--accent-color); outline: none; }
 
 /* Результаты крафта */
-.craft-controls { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
-select { padding: 10px; background: #252525; color: white; border: 1px solid var(--border-color); border-radius: 5px; }
-
 .result-node {
-    margin-top: 10px;
-    padding: 10px;
-    border-left: 2px solid #444;
+    margin-top: 8px;
+    padding: 10px 15px;
+    border-left: 2px solid #30363d;
     background: rgba(255, 255, 255, 0.02);
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 6px 6px 0;
 }
 
+.node-header { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    font-size: 14px;
+}
+
+.done { color: #3fb950; font-weight: 600; }
+
+/* Сообщение об успехе */
+.success-msg {
+    margin-top: 20px;
+    padding: 10px;
+    color: #3fb950;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    background: rgba(46, 160, 67, 0.1);
+    border-radius: 6px;
+}
+
+/* Итоговая секция (Total) */
 .total-section {
-    margin-top: 40px;
+    margin-top: 30px;
     padding: 20px;
-    background: rgba(241, 196, 15, 0.1);
-    border-radius: 10px;
+    background: #0d1117;
+    border-radius: var(--radius);
     border: 1px solid var(--accent-color);
+}
+
+.total-section h2 { 
+    margin: 0 0 15px 0; 
+    font-size: 16px; 
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .total-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-    margin-top: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
 }
 
 .total-item {
+    background: #161b22;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 14px;
+    gap: 8px;
+    border: 1px solid var(--border-color);
 }
 
-.total-item img {
-    width: 20px;
-    height: 20px;
-}
-
-hr {
-    border: 0;
-    border-top: 1px solid #444;
-    margin-bottom: 20px;
-}
-
-.node-header { display: flex; align-items: center; gap: 10px; }
-.node-header img { width: 24px; height: 24px; }
-
-.subs { margin-left: 25px; margin-top: 5px; }
-
-.done { color: var(--success-color); font-weight: bold; }
-.check { color: var(--success-color); margin-left: 5px; }
-
+/* Кнопки действий */
 #add-btn {
-    padding: 10px 15px;
-    background-color: var(--accent-color);
+    background: var(--accent-color);
     color: black;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 0 20px;
+    border-radius: 6px;
     font-weight: bold;
-}
-
-#crafting-list-area {
-    margin: 20px 0;
-}
-
-.craft-list-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #2a2a2a;
-    padding: 8px 12px;
-    border-radius: 5px;
-    margin-bottom: 5px;
-}
-
-.remove-btn {
-    background: #c0392b;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    font-weight: bold;
-    line-height: 22px;
-    text-align: center;
-}
-
-.undo-area {
-    margin-top: 15px;
-    text-align: center;
-}
-
-.undo-btn {
-    background: #3498db;
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
     cursor: pointer;
 }
+
+#add-btn:hover { opacity: 0.9; }
