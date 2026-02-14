@@ -1,171 +1,131 @@
-// data parse (k, m, b, t, q)
-function parseVal(val) {
-    if (typeof val === 'number') return val;
-    if (!val) return 0;
-    const s = val.toString().toLowerCase().trim().replace(/,/g, '');
+// k, m, b, t, q numbers
+const toNum = v => {
+    if (!v) return 0;
+    if (typeof v === 'number') return v;
+    const s = v.toString().toLowerCase().replace(/,/g, '');
     const n = parseFloat(s);
-    if (s.endsWith('k')) return n * 1e3;
-    if (s.endsWith('m')) return n * 1e6;
-    if (s.endsWith('b')) return n * 1e9;
-    if (s.endsWith('t')) return n * 1e12;
-    if (s.endsWith('q')) return n * 1e15;
-    return n || 0;
-}
+    const m = { k: 1e3, m: 1e6, b: 1e9, t: 1e12, q: 1e15 };
+    return n * (m[s.slice(-1)] || 1) || 0;
+};
 
-function formatVal(n) {
-    if (n >= 1e15) return (n / 1e15).toFixed(2).replace(/\.00$/, '') + 'q';
-    if (n >= 1e12) return (n / 1e12).toFixed(2).replace(/\.00$/, '') + 't';
-    if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.00$/, '') + 'b';
-    if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.00$/, '') + 'm';
-    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'k';
-    return Math.floor(n).toLocaleString();
-}
+const fmt = n => {
+    const s = [
+        { v: 1e15, l: 'q' }, { v: 1e12, l: 't' }, { v: 1e9, l: 'b' }, 
+        { v: 1e6, l: 'm' }, { v: 1e3, l: 'k' }
+    ];
+    const f = s.find(x => n >= x.v);
+    if (!f) return Math.floor(n).toLocaleString();
+    return (n / f.v).toFixed(f.v === 1e3 ? 1 : 2).replace(/\.0+$/, '') + f.l;
+};
 
-let finalTotals = {};
+let totals = {};
 
-// tab
-function openTab(id) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+const goTab = (id, el) => {
+    document.querySelectorAll('.tab-content, .nav-btn').forEach(x => x.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    event.currentTarget.classList.add('active');
-}
-// search
-function filterInventory() {
-    const query = document.getElementById('invSearch').value.toLowerCase();
-    document.querySelectorAll('.inv-card').forEach(card => {
-        card.style.display = card.dataset.name.toLowerCase().includes(query) ? 'flex' : 'none';
+    el.classList.add('active');
+};
+
+const find = (q) => {
+    const query = q.toLowerCase();
+    document.querySelectorAll('.inv-card').forEach(c => {
+        c.style.display = c.dataset.name.includes(query) ? 'flex' : 'none';
     });
-}
+};
 
-// inventory
-const SORT_ORDER = [ "Honey", "Royal Jelly", "Star Jelly", "Magic Bean", "Strawberry", "Blueberry", "Pineapple", "Sunflower Seed", "Gumdrops", "Moon Charm", "Coconut", "Stinger", "Neonberry", "Bitterberry", "Honeysuckle", "Whirligig", "Red Extract", "Blue Extract", "Oil", "Enzymes", "Glue", "Glitter", "Tropical Drink", "Purple Potion", "Super Smoothie", "Field Dice", "Smooth Dice", "Loaded Dice", "Soft Wax", "Hard Wax", "Swirled Wax", "Caustic Wax", "Turpentine", "Comforting Vial", "Invigorating Vial", "Refreshing Vial", "Satisfying Vial", "Motivating Vial", "Spirit Petal", "Gold Egg", "Diamond Egg" ];
+// sort inv
+const ORDER = ["Honey", "Royal Jelly", "Star Jelly", "Magic Bean", "Strawberry", "Blueberry", "Pineapple", "Sunflower Seed", "Gumdrops", "Moon Charm", "Coconut", "Stinger", "Neonberry", "Bitterberry", "Honeysuckle", "Whirligig", "Red Extract", "Blue Extract", "Oil", "Enzymes", "Glue", "Glitter", "Tropical Drink", "Purple Potion", "Super Smoothie", "Field Dice", "Smooth Dice", "Loaded Dice", "Soft Wax", "Hard Wax", "Swirled Wax", "Caustic Wax", "Turpentine", "Comforting Vial", "Invigorating Vial", "Refreshing Vial", "Satisfying Vial", "Motivating Vial", "Spirit Petal", "Gold Egg", "Diamond Egg"];
 
-function initInventory() {
+const init = () => {
     const grid = document.getElementById('inventory-grid');
-    grid.innerHTML = '';
     const saved = JSON.parse(localStorage.getItem('bss_inv') || '{}');
-    const sortedNames = Object.keys(BSS_DATA.ingredients).sort((a, b) => {
-        let indexA = SORT_ORDER.indexOf(a), indexB = SORT_ORDER.indexOf(b);
-        if (indexA === -1) indexA = 999; if (indexB === -1) indexB = 999;
-        return indexA - indexB;
+    
+    const items = Object.keys(BSS_DATA.ingredients).sort((a, b) => {
+        const iA = ORDER.indexOf(a), iB = ORDER.indexOf(b);
+        return (iA === -1 ? 999 : iA) - (iB === -1 ? 999 : iB);
     });
 
-    sortedNames.forEach(name => {
-        const item = BSS_DATA.ingredients[name];
-        grid.innerHTML += `
-            <div class="inv-card" data-name="${name.toLowerCase()}">
-                <img src="${item.img}" alt="${name}">
-                <div>
-                    <div class="res-name">${name}</div>
-                    <input type="text" placeholder="0" data-res="${name}" value="${saved[name] || ''}" oninput="saveInv()">
-                </div>
-            </div>`;
-    });
-}
+    grid.innerHTML = items.map(name => `
+        <div class="inv-card" data-name="${name.toLowerCase()}">
+            <img src="${BSS_DATA.ingredients[name].img}">
+            <div>
+                <div class="res-name">${name}</div>
+                <input type="text" placeholder="0" data-res="${name}" value="${saved[name] || ''}" oninput="save()">
+            </div>
+        </div>`).join('');
+};
 
-function saveInv() {
+const save = () => {
     const data = {};
-    document.querySelectorAll('[data-res]').forEach(input => { data[input.dataset.res] = input.value; });
+    document.querySelectorAll('[data-res]').forEach(i => data[i.dataset.res] = i.value);
     localStorage.setItem('bss_inv', JSON.stringify(data));
-    if (document.getElementById('item-select').value) startCalculation();
-}
+    if (document.getElementById('item-select').value) calc();
+};
 
 // craft
-function updateItemList() {
+const updateList = () => {
     const cat = document.getElementById('category-select').value;
-    const select = document.getElementById('item-select');
-    select.innerHTML = '<option value="">-- Select Item --</option>';
-    if (BSS_DATA.crafts[cat]) {
-        Object.keys(BSS_DATA.crafts[cat]).forEach(item => {
-            select.innerHTML += `<option value="${item}">${item}</option>`;
-        });
-    }
-}
-
-function startCalculation() {
-    const cat = document.getElementById('category-select').value;
-    const itemName = document.getElementById('item-select').value;
-    const area = document.getElementById('result-area');
-    if (!itemName) {
-        area.innerHTML = '<p class="placeholder-text">Select an item...</p>';
-        return;
-    }
-
-    finalTotals = {};
-    const recipe = BSS_DATA.crafts[cat][itemName];
-    let html = `<h2>${itemName}</h2>`;
-
-    for (const [resName, count] of Object.entries(recipe)) {
-        if (["image", "img", "recipe"].includes(resName)) continue;
-        html += renderNode(resName, parseVal(count));
-    }
-    
-    html += renderTotalSection();
-    area.innerHTML = html;
-}
-
-function renderNode(name, needed) {
-    const invVal = parseVal(document.querySelector(`[data-res="${name}"]`)?.value || 0);
-    const shortage = Math.max(0, needed - invVal);
-    const isDone = shortage === 0;
-    
-    const itemData = BSS_DATA.ingredients[name];
-    if (!itemData) { console.error(`Resource not found in data.js: ${name}`); return ''; }
-    
-    const hasRecipe = itemData.recipe && itemData.recipe !== "NoRecipe";
-
-    if (shortage > 0 && !hasRecipe) {
-        finalTotals[name] = (finalTotals[name] || 0) + shortage;
-    }
-
-    let html = `
-        <div class="result-node">
-            <div class="node-header ${isDone ? 'done' : ''}">
-                <img src="${itemData.img}" onerror="this.style.display='none'">
-                <span>${name}: ${formatVal(invVal)} / ${formatVal(needed)}</span>
-                ${isDone ? '<span class="check">✔</span>' : ''}
-            </div>`;
-
-    if (!isDone && hasRecipe) {
-        html += `<div class="subs">`;
-        for (const [subName, subCount] of Object.entries(itemData.recipe)) {
-            html += renderNode(subName, parseVal(subCount) * shortage);
-        }
-        html += `</div>`;
-    }
-
-    html += `</div>`;
-    return html;
-}
-
-
-function renderTotalSection() {
-    if (Object.keys(finalTotals).length === 0) return "<p>You have all the required base materials!</p>";
-
-    let html = `
-        <div class="total-section">
-            <hr><h3>Total Base Resources Needed (Shortage):</h3>
-            <div class="total-grid">`;
-    
-    const sorted = Object.entries(finalTotals).sort((a, b) => b[1] - a[1]);
-    
-    for (const [name, amount] of sorted) {
-        if (amount < 1) continue;
-        const img = BSS_DATA.ingredients[name]?.img || '';
-        html += `
-            <div class="total-item">
-                <img src="${img}" onerror="this.style.display='none'">
-                <span><b>${name}:</b> ${formatVal(amount)}</span>
-            </div>`;
-    }
-    
-    html += `</div></div>`;
-    return html;
-}
-
-window.onload = () => {
-    initInventory();
-    updateItemList();
-
+    const sel = document.getElementById('item-select');
+    sel.innerHTML = '<option value="">-- Select Item --</option>' + 
+        Object.keys(BSS_DATA.crafts[cat] || {}).map(i => `<option value="${i}">${i}</option>`).join('');
 };
+
+const calc = () => {
+    const cat = document.getElementById('category-select').value;
+    const name = document.getElementById('item-select').value;
+    const out = document.getElementById('result-area');
+    
+    if (!name) return out.innerHTML = '<p class="placeholder-text">Select an item...</p>';
+
+    totals = {};
+    const recipe = BSS_DATA.crafts[cat][name];
+    let html = `<h2>${name}</h2>`;
+
+    Object.entries(recipe).forEach(([res, count]) => {
+        if (!["image", "img", "recipe"].includes(res)) html += draw(res, toNum(count));
+    });
+
+    out.innerHTML = html + showTotals();
+};
+
+const draw = (name, need) => {
+    const has = tragedy(name);
+    const short = Math.max(0, need - has);
+    const item = BSS_DATA.ingredients[name];
+    const rec = item.recipe && item.recipe !== "NoRecipe" ? item.recipe : null;
+
+    if (short > 0 && !rec) totals[name] = (totals[name] || 0) + short;
+
+    let res = `
+        <div class="result-node">
+            <div class="node-header ${short === 0 ? 'done' : ''}">
+                <img src="${item.img}">
+                <span>${name}: ${fmt(has)} / ${fmt(need)}</span>
+                ${short === 0 ? '<span class="check">✔</span>' : ''}
+            </div>`;
+
+    if (short > 0 && rec) {
+        res += `<div class="subs">` + 
+            Object.entries(rec).map(([n, c]) => draw(n, tragedy(n) + (toNum(c) * short))).join('') + 
+            `</div>`;
+    }
+    return res + `</div>`;
+};
+
+const tragedy = (name) => toNum(document.querySelector(`[data-res="${name}"]`)?.value || 0);
+
+const showTotals = () => {
+    const keys = Object.entries(totals).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]);
+    if (!keys.length) return "<p>You have all materials!</p>";
+
+    return `
+        <div class="total-section"><hr><h3>Shortage:</h3><div class="total-grid">
+            ${keys.map(([n, a]) => `
+                <div class="total-item">
+                    <img src="${BSS_DATA.ingredients[n]?.img || ''}">
+                    <span><b>${n}:</b> ${fmt(a)}</span>
+                </div>`).join('')}
+        </div></div>`;
+};
+
+window.onload = () => { init(); updateList(); };
