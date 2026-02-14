@@ -165,3 +165,7 @@ function renderTotalSection() {
 }
 
 window.onload = () => {
+    initInventory();
+    updateItemList();
+
+};
