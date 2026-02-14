@@ -16,18 +16,13 @@
                 <button class="nav-btn" onclick="openTab('crafting')">Crafting</button>
             </nav>
         </header>
-
-        <!-- Вкладка Инвентаря -->
         <main id="inventory" class="tab-content active">
             <div class="search-bar">
                 <input type="text" id="invSearch" placeholder="Search resources..." oninput="filterInventory()">
             </div>
             <div id="inventory-grid" class="inventory-grid">
-                <!-- Сюда JS вставит все ресурсы -->
             </div>
         </main>
-
-        <!-- Вкладка Крафта -->
         <main id="crafting" class="tab-content">
             <div class="craft-controls">
                 <select id="category-select" onchange="updateItemList()">
@@ -43,15 +38,12 @@
                 </select>
             </div>
             <div id="result-area" class="result-area">
-                <p class="placeholder-text">Select an item to see the recipe breakdown</p>
+                <p class="placeholder-text">Select an item to see the recipe</p>
             </div>
         </main>
     </div>
-
-    <!-- Твой файл с данными -->
     <script src="data.js"></script>
     <script src="script.js"></script>
-
     <a href="https://ko-fi.com/ewasion" target="_blank" class="kofi-link">
     <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi">
     <span>Support me</span>
@@ -59,4 +51,5 @@
 </body>
 
 </html>
+
 
