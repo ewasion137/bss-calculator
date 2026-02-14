@@ -1,4 +1,4 @@
-// --- 1. Парсинг чисел (k, m, b, t, q) ---
+// data parse (k, m, b, t, q)
 function parseVal(val) {
     if (typeof val === 'number') return val;
     if (!val) return 0;
@@ -23,14 +23,14 @@ function formatVal(n) {
 
 let finalTotals = {};
 
-// --- 2. Вкладки и Поиск ---
+// tab
 function openTab(id) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     event.currentTarget.classList.add('active');
 }
-
+// search
 function filterInventory() {
     const query = document.getElementById('invSearch').value.toLowerCase();
     document.querySelectorAll('.inv-card').forEach(card => {
@@ -38,7 +38,7 @@ function filterInventory() {
     });
 }
 
-// --- 3. Инвентарь (с сортировкой) ---
+// inventory
 const SORT_ORDER = [ "Honey", "Royal Jelly", "Star Jelly", "Magic Bean", "Strawberry", "Blueberry", "Pineapple", "Sunflower Seed", "Gumdrops", "Moon Charm", "Coconut", "Stinger", "Neonberry", "Bitterberry", "Honeysuckle", "Whirligig", "Red Extract", "Blue Extract", "Oil", "Enzymes", "Glue", "Glitter", "Tropical Drink", "Purple Potion", "Super Smoothie", "Field Dice", "Smooth Dice", "Loaded Dice", "Soft Wax", "Hard Wax", "Swirled Wax", "Caustic Wax", "Turpentine", "Comforting Vial", "Invigorating Vial", "Refreshing Vial", "Satisfying Vial", "Motivating Vial", "Spirit Petal", "Gold Egg", "Diamond Egg" ];
 
 function initInventory() {
@@ -71,7 +71,7 @@ function saveInv() {
     if (document.getElementById('item-select').value) startCalculation();
 }
 
-// --- 4. Логика Крафта (ИСПРАВЛЕННАЯ) ---
+// craft
 function updateItemList() {
     const cat = document.getElementById('category-select').value;
     const select = document.getElementById('item-select');
@@ -92,7 +92,7 @@ function startCalculation() {
         return;
     }
 
-    finalTotals = {}; // Сброс итогов
+    finalTotals = {};
     const recipe = BSS_DATA.crafts[cat][itemName];
     let html = `<h2>${itemName}</h2>`;
 
@@ -115,7 +115,6 @@ function renderNode(name, needed) {
     
     const hasRecipe = itemData.recipe && itemData.recipe !== "NoRecipe";
 
-    // **КЛЮЧЕВОЙ ФИКС:** Добавляем в итоги только базовые ресурсы (у которых нет рецепта)
     if (shortage > 0 && !hasRecipe) {
         finalTotals[name] = (finalTotals[name] || 0) + shortage;
     }
@@ -131,7 +130,6 @@ function renderNode(name, needed) {
     if (!isDone && hasRecipe) {
         html += `<div class="subs">`;
         for (const [subName, subCount] of Object.entries(itemData.recipe)) {
-            // Рекурсивный вызов теперь корректно передает нехватку вниз по дереву
             html += renderNode(subName, parseVal(subCount) * shortage);
         }
         html += `</div>`;
@@ -169,4 +167,5 @@ function renderTotalSection() {
 window.onload = () => {
     initInventory();
     updateItemList();
+
 };
