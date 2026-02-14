@@ -1,275 +1,210 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-* {
-    box-sizing: border-box;
-    transition: all 0.2s ease;
-}
-
+/* Base */
 :root {
-    --bg-color: #0d1117;
-    --card-bg: #161b22;
-    --border-color: #30363d;
-    --accent-color: #f1c40f;
-    --text-color: #c9d1d9;
-    --text-muted: #8b949e;
-    --success-color: #238636;
-    --radius: 8px;
+    --bg: #09090b;
+    --card: #18181b;
+    --border: #27272a;
+    --accent: #facc15;
+    --text: #fafafa;
+    --muted: #a1a1aa;
+    --green: #22c55e;
+    --radius: 10px;
 }
+
+* { box-sizing: border-box; transition: 0.2s ease; }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
     margin: 0;
-    padding: 20px;
-    line-height: 1.4;
+    padding: 24px;
+    line-height: 1.5;
 }
 
-.app-container { max-width: 850px; margin: 0 auto; }
+.app-container { max-width: 900px; margin: 0 auto; }
 
-/* Навигация */
+/* Navigation */
 nav { 
     display: flex; 
-    gap: 8px; 
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
+    gap: 12px; 
+    margin-bottom: 32px;
 }
 
 .nav-btn {
-    padding: 8px 16px;
-    background: #21262d;
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
     cursor: pointer;
-    border-radius: 6px;
-    font-weight: 600;
+    border-radius: var(--radius);
+    font-weight: 500;
     font-size: 14px;
 }
 
-.nav-btn:hover { background: #30363d; }
+.nav-btn:hover { border-color: var(--muted); color: var(--text); }
 .nav-btn.active { 
-    background: var(--accent-color); 
+    background: var(--accent); 
     color: #000; 
-    border-color: var(--accent-color);
+    border-color: var(--accent);
+    font-weight: 600;
 }
 
-/* Контейнеры вкладок */
-.tab-content { 
-    display: none; 
-    animation: fadeIn 0.3s ease;
-}
+/* Tabs */
+.tab-content { display: none; animation: slideUp 0.3s ease; }
+.tab-content.active { display: block; }
 
-.tab-content.active { 
-    display: block; 
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border-color);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Инвентарь (Resources) */
+/* Inventory Grid */
 .inventory-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
 }
 
 .inv-card {
-    background: #0d1117;
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
+    background: var(--card);
+    padding: 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
     display: flex;
-    flex-direction: column; /* Текст над инпутом для компактности */
-    gap: 6px;
+    flex-direction: column;
+    gap: 10px;
 }
+
+.inv-card:hover { border-color: var(--muted); }
 
 .inv-header {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
-/* Маленькие иконки */
 .inv-card img, .node-header img, .total-item img { 
-    width: 22px; 
-    height: 22px; 
-    object-fit: contain; 
+    width: 24px; height: 24px; object-fit: contain; 
 }
 
 .inv-card input {
     width: 100%;
-    background: #161b22;
-    border: 1px solid var(--border-color);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
     font-size: 13px;
+    outline: none;
 }
 
-.inv-card input:focus { border-color: var(--accent-color); outline: none; }
+.inv-card input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 
-/* Крафт (Интерфейс выбора) */
+/* Crafting UI */
 .craft-controls { 
     display: flex; 
-    gap: 10px; 
-    margin-bottom: 20px; 
-    background: #0d1117;
-    padding: 15px;
-    border-radius: 6px;
+    gap: 12px; 
+    margin-bottom: 24px; 
+    background: var(--card);
+    padding: 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
 }
 
-/* Стилизация Select */
 select { 
     flex: 1;
-    padding: 8px 12px; 
-    background: #161b22; 
-    color: white; 
-    border: 1px solid var(--border-color); 
-    border-radius: 6px;
-    cursor: pointer;
+    padding: 10px; 
+    background: var(--bg); 
+    color: #fff; 
+    border: 1px solid var(--border); 
+    border-radius: 8px;
     font-family: inherit;
+    cursor: pointer;
 }
 
-select:focus { border-color: var(--accent-color); outline: none; }
-
-/* Результаты крафта */
+/* Result Tree */
 .result-node {
-    margin-top: 8px;
-    padding: 10px 15px;
-    border-left: 2px solid #30363d;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 0 6px 6px 0;
+    margin-top: 10px;
+    padding-left: 20px;
+    border-left: 1px solid var(--border);
 }
 
 .node-header { 
     display: flex; 
     align-items: center; 
-    gap: 10px; 
+    gap: 12px; 
+    padding: 8px 0;
     font-size: 14px;
 }
 
-.done { color: #3fb950; font-weight: 600; }
+.done { color: var(--green); font-weight: 600; }
+.check { margin-left: auto; color: var(--green); }
 
-/* Сообщение об успехе */
-.success-msg {
-    margin-top: 20px;
-    padding: 10px;
-    color: #3fb950;
-    font-weight: 600;
-    font-size: 14px;
-    text-align: center;
-    background: rgba(46, 160, 67, 0.1);
-    border-radius: 6px;
-}
-
-/* Итоговая секция (Total) */
+/* Total Section */
 .total-section {
-    margin-top: 30px;
-    padding: 20px;
-    background: #0d1117;
+    margin-top: 40px;
+    padding: 24px;
+    background: var(--card);
     border-radius: var(--radius);
-    border: 1px solid var(--accent-color);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
 }
 
-.total-section h2 { 
-    margin: 0 0 15px 0; 
-    font-size: 16px; 
-    color: var(--accent-color);
+.total-section h3 { 
+    margin: 0 0 20px 0; 
+    font-size: 14px; 
+    color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .total-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
 }
 
 .total-item {
-    background: #161b22;
-    padding: 6px 10px;
-    border-radius: 4px;
+    background: var(--bg);
+    padding: 10px 14px;
+    border-radius: 8px;
     font-size: 13px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    border: 1px solid var(--border-color);
+    gap: 10px;
+    border: 1px solid var(--border);
 }
 
-/* Кнопки действий */
-#add-btn {
-    background: var(--accent-color);
-    color: black;
-    border: none;
-    padding: 0 20px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-}
+.total-item b { color: var(--accent); }
 
-#add-btn:hover { opacity: 0.9; }
-
-/* Кнопка Ko-Fi: фиксированная в углу */
+/* Ko-fi Button */
 .kofi-link {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000; /* Чтобы была поверх всех элементов */
-    
-    background-color: #ff5e5b; /* Яркий цвет Ko-fi (красный/оранжевый) */
-    color: white !important;
+    bottom: 24px;
+    right: 24px;
+    background: #ff5e5b;
+    color: #fff !important;
     text-decoration: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
     font-weight: 700;
-    
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 16px;
-    border-radius: 50px; /* Скругленные края (как пилюля) */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    padding: 12px 20px;
+    border-radius: 50px;
+    box-shadow: 0 10px 20px -5px rgba(255, 94, 91, 0.4);
+    z-index: 100;
 }
 
-/* Ограничиваем размер картинки, чтобы она не раздувалась */
-.kofi-link img {
-    width: 24px !important; /* Жестко задаем размер чашки */
-    height: 24px !important;
-    display: block;
-    margin: 0;
-}
+.kofi-link:hover { transform: translateY(-4px); box-shadow: 0 15px 25px -5px rgba(255, 94, 91, 0.5); }
+.kofi-link img { width: 24px; }
 
-/* Стили для текста внутри */
-.kofi-link span {
-    color: white;
-    letter-spacing: 0.3px;
-}
-
-/* Эффект при наведении */
-.kofi-link:hover {
-    transform: translateY(-3px) scale(1.03); /* Немного приподнимается */
-    background-color: #e54e4b;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-}
-
-/* Для мобильных устройств (делаем еще компактнее) */
-@media (max-width: 480px) {
-    .kofi-link {
-        padding: 8px;
-        bottom: 15px;
-        right: 15px;
-    }
-    .kofi-link span {
-        display: none; /* Скрываем текст на очень маленьких экранах, оставляем только иконку */
-    }
+/* Responsive */
+@media (max-width: 600px) {
+    .craft-controls { flex-direction: column; }
+    .kofi-link span { display: none; }
+    .kofi-link { padding: 12px; border-radius: 50%; }
 }
