@@ -1,14 +1,14 @@
-// data parse (k, m, b, t, q)
+// Парсинг значений (k, m, b, t, q)
 function parseVal(val) {
     if (typeof val === 'number') return val;
     if (!val) return 0;
     const s = val.toString().toLowerCase().trim().replace(/,/g, '');
     const n = parseFloat(s);
-    if (s.endsWith('k')) return n * 1e3;
-    if (s.endsWith('m')) return n * 1e6;
-    if (s.endsWith('b')) return n * 1e9;
-    if (s.endsWith('t')) return n * 1e12;
     if (s.endsWith('q')) return n * 1e15;
+    if (s.endsWith('t')) return n * 1e12;
+    if (s.endsWith('b')) return n * 1e9;
+    if (s.endsWith('m')) return n * 1e6;
+    if (s.endsWith('k')) return n * 1e3;
     return n || 0;
 }
 
@@ -21,44 +21,20 @@ function formatVal(n) {
     return Math.floor(n).toLocaleString();
 }
 
-let finalTotals = {};
-
-// tab
-function openTab(id) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    event.currentTarget.classList.add('active');
-}
-// search
-function filterInventory() {
-    const query = document.getElementById('invSearch').value.toLowerCase();
-    document.querySelectorAll('.inv-card').forEach(card => {
-        card.style.display = card.dataset.name.toLowerCase().includes(query) ? 'flex' : 'none';
-    });
-}
-
-// inventory
-const SORT_ORDER = [ "Honey", "Royal Jelly", "Star Jelly", "Magic Bean", "Strawberry", "Blueberry", "Pineapple", "Sunflower Seed", "Gumdrops", "Moon Charm", "Coconut", "Stinger", "Neonberry", "Bitterberry", "Honeysuckle", "Whirligig", "Red Extract", "Blue Extract", "Oil", "Enzymes", "Glue", "Glitter", "Tropical Drink", "Purple Potion", "Super Smoothie", "Field Dice", "Smooth Dice", "Loaded Dice", "Soft Wax", "Hard Wax", "Swirled Wax", "Caustic Wax", "Turpentine", "Comforting Vial", "Invigorating Vial", "Refreshing Vial", "Satisfying Vial", "Motivating Vial", "Spirit Petal", "Gold Egg", "Diamond Egg" ];
-
+// 1. Инициализация инвентаря
 function initInventory() {
     const grid = document.getElementById('inventory-grid');
     grid.innerHTML = '';
     const saved = JSON.parse(localStorage.getItem('bss_inv') || '{}');
-    const sortedNames = Object.keys(BSS_DATA.ingredients).sort((a, b) => {
-        let indexA = SORT_ORDER.indexOf(a), indexB = SORT_ORDER.indexOf(b);
-        if (indexA === -1) indexA = 999; if (indexB === -1) indexB = 999;
-        return indexA - indexB;
-    });
-
-    sortedNames.forEach(name => {
+    
+    Object.keys(BSS_DATA.ingredients).forEach(name => {
         const item = BSS_DATA.ingredients[name];
         grid.innerHTML += `
             <div class="inv-card" data-name="${name.toLowerCase()}">
-                <img src="${item.img}" alt="${name}">
-                <div>
-                    <div class="res-name">${name}</div>
-                    <input type="text" placeholder="0" data-res="${name}" value="${saved[name] || ''}" oninput="saveInv()">
+                <img src="${item.img}" onerror="this.style.display='none'">
+                <div class="res-info">
+                    <span class="res-name">${name}</span>
+                    <input type="text" data-res="${name}" value="${saved[name] || ''}" oninput="saveInv()">
                 </div>
             </div>`;
     });
@@ -66,12 +42,72 @@ function initInventory() {
 
 function saveInv() {
     const data = {};
-    document.querySelectorAll('[data-res]').forEach(input => { data[input.dataset.res] = input.value; });
+    document.querySelectorAll('[data-res]').forEach(input => { if(input.value) data[input.dataset.res] = input.value; });
     localStorage.setItem('bss_inv', JSON.stringify(data));
-    if (document.getElementById('item-select').value) startCalculation();
+    startCalculation();
 }
 
-// craft
+// 2. Ядро расчета: рекурсивно собирает все базовые ресурсы
+function getFlattenedNeeds(itemName, count, result = {}) {
+    const itemData = BSS_DATA.ingredients[itemName];
+    
+    // Если нет рецепта — это базовый ресурс
+    if (!itemData || itemData.recipe === "NoRecipe") {
+        result[itemName] = (result[itemName] || 0) + count;
+    } else {
+        // Если есть рецепт — идем вглубь
+        for (const [subName, subCount] of Object.entries(itemData.recipe)) {
+            getFlattenedNeeds(subName, parseVal(subCount) * count, result);
+        }
+    }
+    return result;
+}
+
+// 3. Отрисовка
+function startCalculation() {
+    const cat = document.getElementById('category-select').value;
+    const itemName = document.getElementById('item-select').value;
+    const area = document.getElementById('result-area');
+    
+    if (!itemName) return;
+
+    // Получаем плоский список всего нужного
+    const totalNeeded = getFlattenedNeeds(itemName, 1);
+    
+    // Получаем текущий инвентарь
+    const inv = JSON.parse(localStorage.getItem('bss_inv') || '{}');
+    
+    let html = `<h2>${itemName}</h2><div class="total-grid">`;
+    let hasShortage = false;
+
+    for (const [name, needed] of Object.entries(totalNeeded)) {
+        const have = parseVal(inv[name] || 0);
+        const shortage = Math.max(0, needed - have);
+        
+        if (shortage > 0) {
+            hasShortage = true;
+            const img = BSS_DATA.ingredients[name]?.img || '';
+            html += `
+                <div class="total-item">
+                    <img src="${img}" onerror="this.style.display='none'">
+                    <span><b>${name}:</b> ${formatVal(shortage)}</span>
+                </div>`;
+        }
+    }
+
+    if (!hasShortage) html += `<p>You have enough resources!</p>`;
+    html += `</div>`;
+    area.innerHTML = html;
+}
+
+// Утилиты
+function openTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
 function updateItemList() {
     const cat = document.getElementById('category-select').value;
     const select = document.getElementById('item-select');
@@ -83,115 +119,14 @@ function updateItemList() {
     }
 }
 
-function getRequiredBaseResources(name, count, totals = {}) {
-    const itemData = BSS_DATA.ingredients[name];
-    
-    // Если предмета нет в базе или у него нет рецепта -> значит это базовый ресурс
-    if (!itemData || !itemData.recipe || itemData.recipe === "NoRecipe") {
-        totals[name] = (totals[name] || 0) + count;
-    } else {
-        // Если есть рецепт -> идем глубже
-        for (const [subName, subCount] of Object.entries(itemData.recipe)) {
-            // Пропускаем мета-поля
-            if (["image", "img", "recipe"].includes(subName)) continue;
-            getRequiredBaseResources(subName, parseVal(subCount) * count, totals);
-        }
-    }
-    return totals;
-}
-
-function startCalculation() {
-    const cat = document.getElementById('category-select').value;
-    const itemName = document.getElementById('item-select').value;
-    const area = document.getElementById('result-area');
-    
-    if (!itemName) {
-        area.innerHTML = '<p class="placeholder-text">Select an item...</p>';
-        return;
-    }
-
-    // 1. Считаем глобально сколько всего нужно (БЕЗ учета инвентаря)
-    const totalNeeded = getRequiredBaseResources(itemName, 1);
-    
-    // 2. Считаем дефицит
-    finalTotals = {}; // глобальная переменная, которая у тебя уже есть
-    for (const [name, needed] of Object.entries(totalNeeded)) {
-        const invVal = parseVal(document.querySelector(`[data-res="${name}"]`)?.value || 0);
-        const shortage = Math.max(0, needed - invVal);
-        if (shortage > 0) {
-            finalTotals[name] = shortage;
-        }
-    }
-
-    // 3. Рисуем (вызываем старую отрисовку)
-    let html = `<h2>${itemName}</h2>`;
-    // Тут ты можешь оставить свою логику отображения дерева, 
-    // но если хочешь просто список - достаточно renderTotalSection()
-    html += renderTotalSection();
-    area.innerHTML = html;
-}
-
-function renderNode(name, needed) {
-    const invVal = parseVal(document.querySelector(`[data-res="${name}"]`)?.value || 0);
-    const shortage = Math.max(0, needed - invVal);
-    const isDone = shortage === 0;
-    
-    const itemData = BSS_DATA.ingredients[name];
-    if (!itemData) { console.error(`Resource not found in data.js: ${name}`); return ''; }
-    
-    const hasRecipe = itemData.recipe && itemData.recipe !== "NoRecipe";
-
-    if (shortage > 0 && !hasRecipe) {
-        finalTotals[name] = (finalTotals[name] || 0) + shortage;
-    }
-
-    let html = `
-        <div class="result-node">
-            <div class="node-header ${isDone ? 'done' : ''}">
-                <img src="${itemData.img}" onerror="this.style.display='none'">
-                <span>${name}: ${formatVal(invVal)} / ${formatVal(needed)}</span>
-                ${isDone ? '<span class="check">✔</span>' : ''}
-            </div>`;
-
-    if (!isDone && hasRecipe) {
-        html += `<div class="subs">`;
-        for (const [subName, subCount] of Object.entries(itemData.recipe)) {
-            html += renderNode(subName, parseVal(subCount) * shortage);
-        }
-        html += `</div>`;
-    }
-
-    html += `</div>`;
-    return html;
-}
-
-
-function renderTotalSection() {
-    if (Object.keys(finalTotals).length === 0) return "<p>You have all the required base materials!</p>";
-
-    let html = `
-        <div class="total-section">
-            <hr><h3>Total Base Resources Needed (Shortage):</h3>
-            <div class="total-grid">`;
-    
-    const sorted = Object.entries(finalTotals).sort((a, b) => b[1] - a[1]);
-    
-    for (const [name, amount] of sorted) {
-        if (amount < 1) continue;
-        const img = BSS_DATA.ingredients[name]?.img || '';
-        html += `
-            <div class="total-item">
-                <img src="${img}" onerror="this.style.display='none'">
-                <span><b>${name}:</b> ${formatVal(amount)}</span>
-            </div>`;
-    }
-    
-    html += `</div></div>`;
-    return html;
+function filterInventory() {
+    const query = document.getElementById('invSearch').value.toLowerCase();
+    document.querySelectorAll('.inv-card').forEach(card => {
+        card.style.display = card.dataset.name.includes(query) ? 'flex' : 'none';
+    });
 }
 
 window.onload = () => {
     initInventory();
     updateItemList();
-
 };
