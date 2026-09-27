@@ -83,24 +83,50 @@ function updateItemList() {
     }
 }
 
+function getRequiredBaseResources(name, count, totals = {}) {
+    const itemData = BSS_DATA.ingredients[name];
+    
+    // Если предмета нет в базе или у него нет рецепта -> значит это базовый ресурс
+    if (!itemData || !itemData.recipe || itemData.recipe === "NoRecipe") {
+        totals[name] = (totals[name] || 0) + count;
+    } else {
+        // Если есть рецепт -> идем глубже
+        for (const [subName, subCount] of Object.entries(itemData.recipe)) {
+            // Пропускаем мета-поля
+            if (["image", "img", "recipe"].includes(subName)) continue;
+            getRequiredBaseResources(subName, parseVal(subCount) * count, totals);
+        }
+    }
+    return totals;
+}
+
 function startCalculation() {
     const cat = document.getElementById('category-select').value;
     const itemName = document.getElementById('item-select').value;
     const area = document.getElementById('result-area');
+    
     if (!itemName) {
         area.innerHTML = '<p class="placeholder-text">Select an item...</p>';
         return;
     }
 
-    finalTotals = {};
-    const recipe = BSS_DATA.crafts[cat][itemName];
-    let html = `<h2>${itemName}</h2>`;
-
-    for (const [resName, count] of Object.entries(recipe)) {
-        if (["image", "img", "recipe"].includes(resName)) continue;
-        html += renderNode(resName, parseVal(count));
-    }
+    // 1. Считаем глобально сколько всего нужно (БЕЗ учета инвентаря)
+    const totalNeeded = getRequiredBaseResources(itemName, 1);
     
+    // 2. Считаем дефицит
+    finalTotals = {}; // глобальная переменная, которая у тебя уже есть
+    for (const [name, needed] of Object.entries(totalNeeded)) {
+        const invVal = parseVal(document.querySelector(`[data-res="${name}"]`)?.value || 0);
+        const shortage = Math.max(0, needed - invVal);
+        if (shortage > 0) {
+            finalTotals[name] = shortage;
+        }
+    }
+
+    // 3. Рисуем (вызываем старую отрисовку)
+    let html = `<h2>${itemName}</h2>`;
+    // Тут ты можешь оставить свою логику отображения дерева, 
+    // но если хочешь просто список - достаточно renderTotalSection()
     html += renderTotalSection();
     area.innerHTML = html;
 }
